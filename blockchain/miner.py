@@ -22,10 +22,19 @@ def proof_of_work(last_proof):
 
     start = timer()
 
-    print("Searching for next proof")
-    proof = 0
-    #  TODO: Your code here
+    print("Searching for next proof...")
+    
+    # Mined 2 coins with this as proof.
+    # proof = 0
+    
+    proof = random.randint(0, 12301992)
 
+    last = f'{last_proof}'.encode()
+    last_hash = hashlib.sha256(last).hexdigest()
+
+    while valid_proof(last_hash, proof) is False:
+        proof += 1
+    
     print("Proof found: " + str(proof) + " in " + str(timer() - start))
     return proof
 
@@ -39,8 +48,13 @@ def valid_proof(last_hash, proof):
     IE:  last_hash: ...AE9123456, new hash 123456E88...
     """
 
-    # TODO: Your code here!
-    pass
+    guess = f'{proof}'.encode()
+    guess_hash = hashlib.sha256(guess).hexdigest()
+
+    # last = f'{last_hash}'.encode()
+    # last_hash = hashlib.sha256(guess_last).hexdigest()
+
+    return last_hash[-6:] == guess_hash[:6]   
 
 
 if __name__ == '__main__':
@@ -52,7 +66,7 @@ if __name__ == '__main__':
 
     coins_mined = 0
 
-    # Load or create ID
+    # Load or create ID.
     f = open("my_id.txt", "r")
     id = f.read()
     print("ID is", id)
@@ -61,9 +75,9 @@ if __name__ == '__main__':
     if id == 'NONAME\n':
         print("ERROR: You must change your name in `my_id.txt`!")
         exit()
-    # Run forever until interrupted
+    # Run forever until interrupted.
     while True:
-        # Get the last proof from the server
+        # Get the last proof from the server.
         r = requests.get(url=node + "/last_proof")
         data = r.json()
         new_proof = proof_of_work(data.get('proof'))
